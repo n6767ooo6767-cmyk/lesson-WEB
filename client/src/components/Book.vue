@@ -1,21 +1,32 @@
 <template>
-  <div class="book-card" @dblclick="startEdit">
-    <div v-if="!isEditing" class="info">
-      <router-link :to="`/book/${book.id}`">
-        <h3>{{ book.title }}</h3>
-      </router-link>
-      <p>Автор: {{ book.author }}</p>
-      <p v-if="book.genre">Жанр: {{ book.genre }}</p>
-    </div>
-    <div v-else class="edit">
-      <input v-model="editTitle" placeholder="Название" />
-      <input v-model="editAuthor" placeholder="Автор" />
+  <article
+    class="book-card"
+    title="Двойной клик — редактировать"
+    @dblclick="startEdit"
+  >
+    <template v-if="!isEditing">
+      <div class="book-info">
+        <h3 class="book-title">
+          <router-link :to="`/book/${book.id}`">{{ book.title }}</router-link>
+        </h3>
+        <p class="book-author">{{ book.author }}</p>
+      </div>
+      <span v-if="book.genre" class="book-genre">{{ book.genre }}</span>
+      <button class="danger" @click.stop="emitDelete">Удалить</button>
+    </template>
+
+    <form v-else class="book-edit" @submit.prevent="saveEdit" @keydown.esc="cancelEdit">
+      <input v-model="editTitle" placeholder="Название" required />
+      <input v-model="editAuthor" placeholder="Автор" required />
       <input v-model="editGenre" placeholder="Жанр" />
-      <button @click.stop="saveEdit">Сохранить</button>
-      <button @click.stop="cancelEdit">Отмена</button>
-    </div>
-    <button class="delete" @click.stop="emitDelete">Удалить</button>
-  </div>
+      <div class="book-edit__actions">
+        <button type="submit">Сохранить</button>
+        <button type="button" class="ghost" @click.stop="cancelEdit">
+          Отмена
+        </button>
+      </div>
+    </form>
+  </article>
 </template>
 
 <script setup>
@@ -39,15 +50,18 @@ function startEdit() {
   isEditing.value = true
   editTitle.value = props.book.title
   editAuthor.value = props.book.author
-  editGenre.value = props.book.genre || ''
+  editGenre.value = props.book.genre === 'Без жанра' ? '' : props.book.genre || ''
 }
 
 function saveEdit() {
+  const title = editTitle.value.trim()
+  const author = editAuthor.value.trim()
+  if (!title || !author) return
   emit('update', {
     id: props.book.id,
-    title: editTitle.value,
-    author: editAuthor.value,
-    genre: editGenre.value
+    title,
+    author,
+    genre: editGenre.value.trim() || 'Без жанра'
   })
   isEditing.value = false
 }
@@ -63,52 +77,78 @@ function emitDelete() {
 
 <style scoped>
 .book-card {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 16px;
-  margin: 8px 0;
-  background: #f9f9f9;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
   cursor: pointer;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
-.book-card h3 {
-  margin: 0 0 8px 0;
+
+.book-card:hover {
+  border-color: var(--accent-border);
+  box-shadow: var(--shadow);
 }
-.book-card a {
-  color: #2c3e50;
+
+.book-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.book-title {
+  margin: 0;
+  font-family: var(--heading);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 130%;
+}
+
+.book-title a {
+  color: var(--text-h);
   text-decoration: none;
 }
-.book-card a:hover {
+
+.book-title a:hover {
+  color: var(--accent);
   text-decoration: underline;
 }
-.info {
-  flex: 1;
+
+.book-author {
+  margin-top: 2px;
+  font-size: 14px;
 }
-.edit {
+
+.book-genre {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--accent);
+  background: var(--accent-bg);
+  white-space: nowrap;
+}
+
+.book-edit {
   flex: 1;
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  cursor: default;
 }
-.edit input {
-  padding: 6px;
-  margin-bottom: 4px;
+
+.book-edit input {
+  flex: 1 1 140px;
+  min-width: 0;
 }
-button {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-left: 4px;
-}
-.delete {
-  background: #e74c3c;
-  color: white;
-}
-.edit button {
-  background: #42b883;
-  color: white;
+
+.book-edit__actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
 }
 </style>

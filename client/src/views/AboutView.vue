@@ -1,10 +1,22 @@
 <template>
-  <div>
+  <section class="about">
     <h1>О проекте</h1>
-    <p>Это моя первая библиотека на Vue 3. Здесь я учусь создавать сайты.</p>
-    <p>Автор: Алексей</p>
-  </div>
+    <p>
+      Это учебная библиотека книг на Vue 3. Книги можно добавлять, искать по
+      названию, редактировать и удалять, а список сохраняется в браузере.
+    </p>
+    <p class="about__author">Автор: Алексей</p>
+  </section>
 </template>
 
-<script setup>
-</script>
+<style scoped>
+.about p {
+  max-width: 560px;
+}
+
+.about__author {
+  margin-top: 16px;
+  color: var(--text-h);
+  font-weight: 500;
+}
+</style>
