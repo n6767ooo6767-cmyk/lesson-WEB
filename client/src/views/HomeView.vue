@@ -10,6 +10,7 @@
         type="search"
         placeholder="Поиск по названию..."
       />
+      <button @click="loadFromAPI">Загрузить из API</button>
       <p v-if="searchQuery" class="toolbar__counter">
         Найдено книг: {{ filteredBooks.length }}
       </p>
@@ -49,6 +50,32 @@ function loadBooks() {
     return null
   }
   return null
+}
+
+const loading = ref(false)
+const error = ref('')
+
+async function loadFromApi() {
+  loading.value = true
+  error.value = ''
+  try {
+    const res = await fetch('https://openlibrary.org/search.json?q=javascript&limit=5')
+    if (!res.ok) throw new Error('Ошибка сети: ' + res.status)
+    const data = await res.json()
+
+    const newBooks = data.docs.map((item, index) => ({
+      id: nextId++,
+      title: item.title,
+      author: item.author_name ? item.author_name[0] : 'Неизвестен',
+      genre: String(item.first_publish_year || '—')
+    }))
+
+    books.value.push(...newBooks)
+  } catch (e) {
+    error.value = 'Не удалось загрузить книги: ' + e.message
+  } finally {
+    loading.value = false
+  }
 }
 
 const books = ref(loadBooks() ?? defaultBooks)

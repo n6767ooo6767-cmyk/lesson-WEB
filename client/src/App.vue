@@ -1,4 +1,93 @@
 <template>
+  <div class="sandbox">
+    <h1>Песочница</h1>
+  </div>
+  <p>{{ message }}</p>
+  <button @click="message = 'привет'">привет</button>
+  <button @click="hello">bvhgrdo;mfvln</button>
+
+  <h3>{{ kompliment }}</h3>
+  <div v-for="value in kompliments" :key="value">
+    <button @click="kompliment = value">комплимент </button>
+  </div>
+  <div
+    class="hover-box"
+    :class="{active: isHovering}"
+    @mouseover="isHovering = true"
+    @mouseleave="isHovering = false"
+  >
+    {{ isHovering ? "мышь над блоком" : "мышь не над блоком" }}
+  </div>
+  <input
+    v-model="typed"
+    @keydown.enter="onEnter"
+    @keydown.esc="typed = ''"
+    placeholder="Набери текст. Enter — сохранить, Esc — очистить"
+    :maxlength="10"
+  />
+  <p>Введено: {{ typed }}</p>
+  <p v-if="savedText">Сохранено: {{ savedText }}</p>
+</template>
+
+<script setup>
+import { ref } from "vue"
+const message = ref("нажми на кнопку")
+const typed = ref('')
+const savedText = ref('')
+function onEnter() {
+  savedText.value = typed.value
+}
+const kompliments = ref(["ты умный", "ты крутой", "Ты крутой программист"])
+function hello(){
+  message.value = "привет, ты нажал на кнопку в" + new Date().toLocaleTimeString()
+}
+const kompliment = ref("кнопки комплименты")
+const isHovering = ref(false)
+</script>
+
+<style scoped>
+.sandbox {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: flex-start;
+}
+button {
+  padding: 8px 16px;
+  cursor: pointer;
+}
+.hover-box {
+  padding: 24px;
+  border: 2px dashed #999;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.hover-box.active {
+  background: #1001f6;
+  color: #6b71c8;
+  border-color: #ff0000a0;
+}
+
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <template>
   <header class="site-header">
     <div class="site-header__inner">
       <router-link to="/" class="brand">Моя библиотека</router-link>
@@ -93,3 +182,4 @@
   text-align: center;
 }
 </style>
+ -->
